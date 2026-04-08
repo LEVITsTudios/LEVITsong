@@ -315,7 +315,15 @@ export default function App() {
     setGameState('home');
   };
 
-  const startQuiz = () => {
+  const ensureAuth = (action: () => void) => {
+    if (!user) {
+      login();
+      return;
+    }
+    action();
+  };
+
+  const startQuiz = () => ensureAuth(() => {
     const shuffled = [...MUSIC_QUESTIONS].sort(() => 0.5 - Math.random());
     setQuizQuestions(shuffled.slice(0, 20));
     setQuizType('test');
@@ -326,9 +334,9 @@ export default function App() {
     setTimeLeft(600);
     setShowExplanation(false);
     setSidebarOpen(false);
-  };
+  });
 
-  const startExercise = () => {
+  const startExercise = () => ensureAuth(() => {
     setQuizQuestions([...EXERCISES]);
     setQuizType('exercise');
     setGameState('quiz');
@@ -338,7 +346,7 @@ export default function App() {
     setTimeLeft(1800); // 30 mins for exercises
     setShowExplanation(false);
     setSidebarOpen(false);
-  };
+  });
 
   const handleAnswer = (optionIndex: number) => {
     const question = quizQuestions[currentQuestionIndex];
@@ -502,33 +510,33 @@ export default function App() {
             icon={CircleDot} 
             label="Ejercicios" 
             active={gameState === 'exercises'} 
-            onClick={() => { setGameState('exercises'); setSidebarOpen(false); }} 
+            onClick={() => ensureAuth(() => { setGameState('exercises'); setSidebarOpen(false); })} 
           />
           <NavigationItem 
             icon={Music} 
             label="Cancionero" 
             active={gameState === 'songs'} 
-            onClick={() => { setGameState('songs'); setSidebarOpen(false); }} 
+            onClick={() => ensureAuth(() => { setGameState('songs'); setSidebarOpen(false); })} 
           />
           <NavigationItem 
             icon={History} 
             label="Mi Historial" 
             active={gameState === 'history'} 
-            onClick={() => { setGameState('history'); setSidebarOpen(false); }} 
+            onClick={() => ensureAuth(() => { setGameState('history'); setSidebarOpen(false); })} 
           />
           {isAdmin && (
             <NavigationItem 
               icon={ShieldCheck} 
               label="Admin" 
               active={gameState === 'admin'} 
-              onClick={() => { setGameState('admin'); setSidebarOpen(false); }} 
+              onClick={() => ensureAuth(() => { setGameState('admin'); setSidebarOpen(false); })} 
             />
           )}
           <NavigationItem 
             icon={User} 
             label="Mi Perfil" 
             active={gameState === 'profile'} 
-            onClick={() => { setGameState('profile'); setSidebarOpen(false); }} 
+            onClick={() => ensureAuth(() => { setGameState('profile'); setSidebarOpen(false); })} 
           />
         </nav>
 
@@ -635,7 +643,7 @@ export default function App() {
                     <Button variant="secondary" className="w-full">Explorar Temas</Button>
                   </Card>
 
-                  <Card className="group cursor-pointer hover:border-cyan-500/30 transition-all" onClick={() => setGameState('history')}>
+                  <Card className="group cursor-pointer hover:border-cyan-500/30 transition-all" onClick={() => ensureAuth(() => setGameState('history'))}>
                     <div className="w-14 h-14 bg-cyan-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                       <BarChart3 className="w-7 h-7 text-cyan-400" />
                     </div>

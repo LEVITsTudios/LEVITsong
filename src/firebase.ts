@@ -1,8 +1,32 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import firebaseConfig from '../firebase-applet-config.json';
+import firebaseConfigLocal from '../firebase-applet-config.json';
+
+// Helper to get a valid configuration value, prioritizing environment variables
+const getConfigValue = (envValue: string | undefined, localValue: string | undefined): string => {
+  if (envValue && envValue !== 'undefined' && envValue !== 'null' && envValue.trim() !== '') {
+    return envValue;
+  }
+  return localValue || '';
+};
+
+const firebaseConfig = {
+  apiKey: getConfigValue(import.meta.env.VITE_FIREBASE_API_KEY, firebaseConfigLocal?.apiKey),
+  authDomain: getConfigValue(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN, firebaseConfigLocal?.authDomain),
+  projectId: getConfigValue(import.meta.env.VITE_FIREBASE_PROJECT_ID, firebaseConfigLocal?.projectId),
+  storageBucket: getConfigValue(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET, firebaseConfigLocal?.storageBucket),
+  messagingSenderId: getConfigValue(import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID, firebaseConfigLocal?.messagingSenderId),
+  appId: getConfigValue(import.meta.env.VITE_FIREBASE_APP_ID, firebaseConfigLocal?.appId),
+};
+
+const firestoreDatabaseId = getConfigValue(import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID, firebaseConfigLocal?.firestoreDatabaseId);
+
+// Validate that we have at least an API Key before initializing
+if (!firebaseConfig.apiKey) {
+  console.error("Firebase API Key is missing! Please check your configuration.");
+}
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = getFirestore(app, firestoreDatabaseId);
 export const auth = getAuth(app);
