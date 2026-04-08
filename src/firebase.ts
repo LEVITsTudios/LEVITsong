@@ -24,9 +24,9 @@ const firestoreDatabaseId = getConfigValue(import.meta.env.VITE_FIREBASE_FIRESTO
 
 // Validate that we have at least an API Key before initializing
 if (!firebaseConfig.apiKey) {
-  console.error("Firebase API Key is missing! Please check your configuration.");
+  console.warn("Firebase API Key is missing! The app might not function correctly until environment variables are configured.");
 }
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firestoreDatabaseId);
+export const db = getFirestore(app, firestoreDatabaseId || undefined);
 export const auth = getAuth(app);
